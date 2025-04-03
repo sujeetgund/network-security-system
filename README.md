@@ -3,30 +3,30 @@
 ## Project Structure
 
 ```
-└── 📁network-security-project
-    └── 📁.github
-        └── 📁workflows
+└── network-security-project
+    └── .github
+        └── workflows
             └── main.yml
-    └── 📁network_data
-    └── 📁networksecurity
+    └── network_data
+    └── networksecurity
         └── __init__.py
-        └── 📁cloud
+        └── cloud
             └── __init__.py
-        └── 📁components
+        └── components
             └── __init__.py
-        └── 📁constant
+        └── constant
             └── __init__.py
-        └── 📁entity
+        └── entity
             └── __init__.py
-        └── 📁exception
+        └── exception
             └── __init__.py
-        └── 📁logging
+        └── logging
             └── __init__.py
-        └── 📁pipelines
+        └── pipelines
             └── __init__.py
-        └── 📁utils
+        └── utils
             └── __init__.py
-    └── 📁notebooks
+    └── notebooks
     └── .env
     └── .gitignore
     └── Dockerfile
