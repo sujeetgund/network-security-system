@@ -34,4 +34,4 @@ class DataIngestionConfig:
         )
         self.database_name = training_pipeline.DATA_INGESTION_DATABASE_NAME
         self.collection_name = training_pipeline.DATA_INGESTION_COLLECTION_NAME
-        self.train_test_ratio = training_pipeline.DATA_INGESTION_TRAIN_TEST_RATIO
+        self.test_size = training_pipeline.DATA_INGESTION_TEST_SIZE

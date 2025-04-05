@@ -6,3 +6,4 @@ seaborn
 pymongo
 certifi
 pymongo[srv]
+scikit-learn

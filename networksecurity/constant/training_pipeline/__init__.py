@@ -1,6 +1,3 @@
-import os
-import numpy as np
-import pandas as pd
 
 
 # Common constants for the training pipeline
@@ -19,4 +16,4 @@ DATA_INGESTION_COLLECTION_NAME: str = "network_data"
 DATA_INGESTION_NAME: str = "data_ingestion"
 DATA_INGESTION_FEATURE_STORE_NAME: str = "feature_store"
 DATA_INGESTION_INGESTED_NAME: str = "ingested"
-DATA_INGESTION_TRAIN_TEST_RATIO: float = 0.2
+DATA_INGESTION_TEST_SIZE: float = 0.2
