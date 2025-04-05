@@ -35,3 +35,35 @@ class DataIngestionConfig:
         self.database_name = training_pipeline.DATA_INGESTION_DATABASE_NAME
         self.collection_name = training_pipeline.DATA_INGESTION_COLLECTION_NAME
         self.test_size = training_pipeline.DATA_INGESTION_TEST_SIZE
+
+
+class DataValidationConfig:
+    def __init__(self, config: TrainingPipelineConfig):
+        self.data_validation_dir = os.path.join(
+            config.artifact_dir, training_pipeline.DATA_VALIDATION_NAME
+        )
+
+        self.valid_data_dir = os.path.join(
+            self.data_validation_dir, training_pipeline.DATA_VALIDATION_VALID_NAME
+        )
+        self.valid_train_file_path = os.path.join(
+            self.valid_data_dir, training_pipeline.TRAIN_DATA_FILE_NAME
+        )
+        self.valid_test_file_path = os.path.join(
+            self.valid_data_dir, training_pipeline.TEST_DATA_FILE_NAME
+        )
+
+        self.invalid_data_dir = os.path.join(
+            self.data_validation_dir, training_pipeline.DATA_VALIDATION_INVALID_NAME
+        )
+        self.invalid_train_file_path = os.path.join(
+            self.invalid_data_dir, training_pipeline.TRAIN_DATA_FILE_NAME
+        )
+        self.invalid_test_file_path = os.path.join(
+            self.invalid_data_dir, training_pipeline.TEST_DATA_FILE_NAME
+        )
+
+        self.drift_report_file_path = os.path.join(
+            self.data_validation_dir,
+            training_pipeline.DATA_VALIDATION_DRIFT_REPORT_NAME,
+        )
