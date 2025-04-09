@@ -60,7 +60,6 @@ class DataValidation:
             bool: True if the number of columns is valid, False otherwise.
         """
         try:
-            print(self.schema_config)
             expected_number_of_columns = len(self.schema_config["columns"])
             actual_number_of_columns = df.shape[1]
 
