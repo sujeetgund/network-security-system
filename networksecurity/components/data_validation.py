@@ -61,13 +61,13 @@ class DataValidation:
         """
         try:
             print(self.schema_config)
-            expected_columns = self.schema_config["number_of_columns"]
-            actual_columns = df.shape[1]
+            expected_number_of_columns = len(self.schema_config["columns"])
+            actual_number_of_columns = df.shape[1]
 
-            logger.info(f"Expected number of columns: {expected_columns}")
-            logger.info(f"Actual number of columns: {actual_columns}")
+            logger.info(f"Expected number of columns: {expected_number_of_columns}")
+            logger.info(f"Actual number of columns: {actual_number_of_columns}")
 
-            return actual_columns == expected_columns
+            return actual_number_of_columns == expected_number_of_columns
         except Exception as e:
             raise NetworkSecurityException(e)
 
