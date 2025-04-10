@@ -117,3 +117,24 @@ class DataTransformationConfig:
             self.transformed_data_dir,
             training_pipeline.DATA_TRANSFORMATION_TEST_FILE_NAME,
         )
+
+
+class ModelTrainerConfig:
+    def __init__(self, config: TrainingPipelineConfig):
+        # Model Trainer Dir
+        self.model_trainer_dir = os.path.join(
+            config.artifact_dir, training_pipeline.MODEL_TRAINER_DIR_NAME
+        )
+
+        # Trained Model File Path
+        self.trained_model_file_path = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline.MODEL_TRAINER_DIR_NAME,
+            training_pipeline.MODEL_TRAINER_TRAINED_MODEL_NAME,
+        )
+
+        # Least Acceptable Accuracy
+        self.expected_accuracy = training_pipeline.MODEL_TRAINER_EXPECTED_SCORE
+        self.overfitting_underfitting_threshold = (
+            training_pipeline.MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD
+        )
