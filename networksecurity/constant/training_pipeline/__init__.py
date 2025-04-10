@@ -11,6 +11,8 @@ FEATURE_STORE_FILE_NAME: str = "network_data.csv"
 TRAIN_DATA_FILE_NAME: str = "train.csv"
 TEST_DATA_FILE_NAME: str = "test.csv"
 PREPROCESSING_OBJECT_FILE_NAME = "preprocessing.pkl"
+SAVED_MODEL_DIR_NAME =os.path.join("saved_models")
+MODEL_FILE_NAME = "model.pkl"
 
 
 # Data Ingestion related constants start with "DATA_INGESTION" variable name

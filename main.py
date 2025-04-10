@@ -3,10 +3,12 @@ from networksecurity.entity.config_entity import (
     DataIngestionConfig,
     DataValidationConfig,
     DataTransformationConfig,
+    ModelTrainerConfig,
 )
 from networksecurity.components.data_ingestion import DataIngestion
 from networksecurity.components.data_validation import DataValidation
 from networksecurity.components.data_transformation import DataTransformation
+from networksecurity.components.model_trainer import ModelTrainer
 from networksecurity.exception.exception import NetworkSecurityException
 
 
@@ -43,6 +45,16 @@ if __name__ == "__main__":
 
         # Get Data Transformation Artifacts
         data_transformation_artifact = data_transformation.init_data_transformation()
-        print(data_transformation_artifact)
+
+        # Initialize Model Training
+        model_trainer_config = ModelTrainerConfig(config=training_pipeline_config)
+        model_trainer = ModelTrainer(
+            config=model_trainer_config,
+            data_transformation_artifact=data_transformation_artifact,
+        )
+
+        # Get Model Trainer Artifacts
+        model_trainer_artifact = model_trainer.init_model_trainer()
+        print(model_trainer_artifact)
     except Exception as e:
         raise NetworkSecurityException(e)
