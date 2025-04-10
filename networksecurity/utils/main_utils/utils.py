@@ -40,9 +40,6 @@ def write_yaml(filepath: str, content: object, replace: bool = False) -> None:
         None
     """
     try:
-        if os.path.exists(filepath) and not replace:
-            raise FileExistsError(f"File already exists: {filepath}")
-
         if replace and os.path.exists(filepath):
             os.remove(filepath)
 
@@ -92,7 +89,7 @@ def save_object(filepath: str, obj: object) -> None:
         raise NetworkSecurityException(e)
 
 
-def load_numpy_array_data(filepath: str) -> np.array:
+def load_numpy_array_data(filepath: str) -> np.ndarray:
     """
     Loads a numpy array from a file.
 
@@ -129,15 +126,16 @@ def load_object(filepath: str) -> object:
 
 
 def evaluate_models(
-    X_train: np.array,
-    y_train: np.array,
-    X_test: np.array,
-    y_test: np.array,
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_test: np.ndarray,
+    y_test: np.ndarray,
     models: dict,
     params: dict,
 ) -> dict:
     """
-    Evaluates multiple machine learning models and returns the best one based on accuracy.
+    Evaluates multiple machine learning models and returns a report of their performance
+    and the best trained model based on R² score.
 
     Args:
         X_train (np.ndarray): Training features.
@@ -148,10 +146,15 @@ def evaluate_models(
         params (dict): Dictionary of model names and their corresponding hyperparameters.
 
     Returns:
-        dict: Result of the evaluation, including the best model and its r2 scores.
+        dict: A dictionary containing the evaluation report, best model name, best model instance,
+              best score, and best parameters.
     """
     try:
         report = {}
+        best_score = float("-inf")
+        best_model = None
+        best_model_name = None
+        best_params = None
 
         for model_name, model in models.items():
             # Getting possible model parameters from the params dictionary
@@ -161,17 +164,26 @@ def evaluate_models(
             gridcv = GridSearchCV(model, model_params, cv=3)
             gridcv.fit(X_train, y_train)
 
-            # Setting the best parameters to the model
-            model.set_params(**gridcv.best_params_)
-            model.fit(X_train, y_train)
-
             # Predicting and evaluating the model
-            y_preds = model.predict(X_test)
+            best_estimator = gridcv.best_estimator_
+            y_preds = best_estimator.predict(X_test)
             score = r2_score(y_test, y_preds)
 
             report[model_name] = score
 
-        return report
+            if score > best_score:
+                best_score = score
+                best_model_name = model_name
+                best_model = best_estimator
+                best_params = gridcv.best_params_
+
+        return {
+            "report": report,
+            "best_model_name": best_model_name,
+            "best_model": best_model,
+            "best_score": best_score,
+            "best_params": best_params,
+        }
 
     except Exception as e:
         raise NetworkSecurityException(e)

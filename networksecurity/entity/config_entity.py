@@ -129,7 +129,15 @@ class ModelTrainerConfig:
         # Trained Model File Path
         self.trained_model_file_path = os.path.join(
             self.model_trainer_dir,
+            training_pipeline.MODEL_TRAINER_TRAINED_MODEL_DIR_NAME,
             training_pipeline.MODEL_TRAINER_TRAINED_MODEL_NAME,
+        )
+
+        # Model Trainer Report File Path
+        self.training_report_file_path = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline.MODEL_TRAINER_TRAINING_REPORT_DIR_NAME,
+            training_pipeline.MODEL_TRAINER_TRAINING_REPORT_FILE_NAME,
         )
 
         # Least Acceptable Accuracy

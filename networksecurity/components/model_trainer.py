@@ -12,6 +12,7 @@ from networksecurity.logging import logger
 from networksecurity.utils.main_utils import (
     load_object,
     save_object,
+    write_yaml,
     load_numpy_array_data,
     evaluate_models,
 )
@@ -64,10 +65,10 @@ class ModelTrainer:
         """
         try:
             models = {
-                "Random Forest": RandomForestClassifier(verbose=1),
+                "Random Forest": RandomForestClassifier(),
                 "Decision Tree": DecisionTreeClassifier(),
-                "Gradient Boosting": GradientBoostingClassifier(verbose=1),
-                "Logistic Regression": LogisticRegression(verbose=1),
+                "Gradient Boosting": GradientBoostingClassifier(),
+                "Logistic Regression": LogisticRegression(),
                 "AdaBoost": AdaBoostClassifier(),
             }
 
@@ -98,14 +99,9 @@ class ModelTrainer:
             }
 
             # Evaluate models
-            training_report = evaluate_models(
-                X_train, y_train, X_test, y_test, models, params
+            report, best_model_name, best_model, best_score, best_params = (
+                evaluate_models(X_train, y_train, X_test, y_test, models, params)
             )
-
-            # Get best model
-            best_model_name = max(training_report, key=training_report.get)
-            best_model_score = training_report[best_model_name]
-            best_model = models[best_model_name]
 
             y_preds_train = best_model.predict(X_train)
             classification_train_metric = get_classification_score(
@@ -116,18 +112,26 @@ class ModelTrainer:
             classification_test_metric = get_classification_score(
                 y_true=y_test, y_pred=y_preds_test
             )
+
             logger.info(f"Best model name: {best_model_name}")
-            logger.info(f"Best model r2 score: {best_model_score}")
+            logger.info(f"Best model params: {best_params}")
+            logger.info(f"Best model r2 score: {best_score}")
+            logger.info(
+                f"Classification train metric: {classification_train_metric.__dict__}"
+            )
             logger.info(
                 f"Classification test metric: {classification_test_metric.__dict__}"
             )
 
-            # Save model
-            final_model_file_path = os.path.join("final_model", "model.pkl")
-            os.makedirs(os.path.dirname(final_model_file_path), exist_ok=True)
-            save_object(final_model_file_path, best_model)
+            # Saving Model Training Report
+            logger.info("Saving model training report")
+            os.makedirs(
+                os.path.dirname(self.config.training_report_file_path), exist_ok=True
+            )
+            write_yaml(filepath=self.config.training_report_file_path, content=report)
 
             # Create and Save Network Model
+            logger.info("Saving network model")
             preprocessor = load_object(
                 filepath=self.data_transformation_artifact.transformed_object_file_path
             )
@@ -138,7 +142,7 @@ class ModelTrainer:
                 os.path.dirname(self.config.trained_model_file_path), exist_ok=True
             )
             save_object(self.config.trained_model_file_path, network_model)
-            logger.info(f"Network Model saved at {self.config.trained_model_file_path}")
+            logger.info(f"Network model saved at {self.config.trained_model_file_path}")
 
             # Create Model Trainer Artifact
             model_trainer_artifact = ModelTrainerArtifact(
@@ -161,8 +165,8 @@ class ModelTrainer:
             )
 
             # loading training array and testing array
-            train_arr: np.array = load_numpy_array_data(train_file_path)
-            test_arr: np.array = load_numpy_array_data(test_file_path)
+            train_arr = load_numpy_array_data(train_file_path)
+            test_arr = load_numpy_array_data(test_file_path)
 
             X_train, y_train, X_test, y_test = (
                 train_arr[:, :-1],
