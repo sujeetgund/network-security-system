@@ -129,7 +129,6 @@ class ModelTrainerConfig:
         # Trained Model File Path
         self.trained_model_file_path = os.path.join(
             self.model_trainer_dir,
-            training_pipeline.MODEL_TRAINER_DIR_NAME,
             training_pipeline.MODEL_TRAINER_TRAINED_MODEL_NAME,
         )
 
