@@ -5,6 +5,7 @@ from networksecurity.entity.config_entity import ModelTrainerConfig
 from networksecurity.entity.artifact_entity import (
     DataTransformationArtifact,
     ModelTrainerArtifact,
+    ClassificationMetricArtifact,
 )
 
 from networksecurity.exception import NetworkSecurityException
@@ -27,6 +28,8 @@ from sklearn.ensemble import (
 )
 from sklearn.linear_model import LogisticRegression
 
+import mlflow
+
 
 class ModelTrainer:
     def __init__(
@@ -39,6 +42,15 @@ class ModelTrainer:
             self.data_transformation_artifact = data_transformation_artifact
         except Exception as e:
             raise NetworkSecurityException(e)
+
+    def track_mlflow(
+        self, model, classification_metric: ClassificationMetricArtifact
+    ) -> None:
+        with mlflow.start_run():
+            mlflow.log_metric("f1_score", classification_metric.f1_score)
+            mlflow.log_metric("precision", classification_metric.precision_score)
+            mlflow.log_metric("recall", classification_metric.recall_score)
+            mlflow.sklearn.log_model(model, "model")
 
     def train_model(
         self,
@@ -99,19 +111,29 @@ class ModelTrainer:
             }
 
             # Evaluate models
-            report, best_model_name, best_model, best_score, best_params = (
-                evaluate_models(X_train, y_train, X_test, y_test, models, params)
+            evaluation_result = evaluate_models(
+                X_train, y_train, X_test, y_test, models, params
             )
+
+            report = evaluation_result["report"]
+            best_model_name = evaluation_result["best_model_name"]
+            best_model = evaluation_result["best_model"]
+            best_score = evaluation_result["best_score"]
+            best_params = evaluation_result["best_params"]
 
             y_preds_train = best_model.predict(X_train)
             classification_train_metric = get_classification_score(
                 y_true=y_train, y_pred=y_preds_train
             )
+            # Track mlflow for train metric
+            self.track_mlflow(best_model, classification_train_metric)
 
             y_preds_test = best_model.predict(X_test)
             classification_test_metric = get_classification_score(
                 y_true=y_test, y_pred=y_preds_test
             )
+            # Track mlflow for test metric
+            self.track_mlflow(best_model, classification_test_metric)
 
             logger.info(f"Best model name: {best_model_name}")
             logger.info(f"Best model params: {best_params}")

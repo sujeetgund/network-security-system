@@ -3,6 +3,7 @@
 
 draw_folders.py
 artifacts/
+mlruns/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
