@@ -29,6 +29,9 @@ from sklearn.ensemble import (
 from sklearn.linear_model import LogisticRegression
 
 import mlflow
+import dagshub
+
+dagshub.init(repo_owner="sujeetgund", repo_name="network-security-system", mlflow=True)
 
 
 class ModelTrainer:
