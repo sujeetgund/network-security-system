@@ -87,9 +87,23 @@ jobs:
         
         - name: Run Docker Image
           run: |
-            docker run -d -p 8080:8080 --ipc="host" --name=networksecurity -e 'AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID}}' -e 'AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' -e 'AWS_REGION=${{ secrets.AWS_REGION }}'  ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+            docker run -d \
+              -p 8080:8080 \
+              --ipc="host" \
+              --name=networksecurity \
+              -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+              -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+              -e AWS_REGION=${{ secrets.AWS_REGION }} \
+              -e MONGO_URI="${{ secrets.MONGO_URI }}" \
+              ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
         
         - name: Clean previous images and containers
           run: |
             docker system prune -f
+        
+        - name: Show Docker logs (first 20 lines)
+          run: |
+            sleep 5  # wait a bit for startup
+            docker logs --tail 20 networksecurity || true
+          
 
