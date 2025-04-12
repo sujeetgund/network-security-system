@@ -73,6 +73,13 @@ jobs:
         - name: Login to Amazon ECR
           id: ecr-login
           uses: aws-actions/amazon-ecr-login@v1
+      
+        - name: Stop and remove existing container if running
+          run: |
+            if [ "$(docker ps -aq -f name=networksecurity)" ]; then
+              docker stop networksecurity || true
+              docker rm networksecurity || true
+            fi
         
         - name: Pull latest images
           run: |
