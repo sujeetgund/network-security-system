@@ -6,10 +6,18 @@ from networksecurity.constant import training_pipeline
 
 class TrainingPipelineConfig:
     def __init__(self):
-        timestamps = datetime.now().strftime("%Y%m%d%H%M%S")
+        self.timestamps = datetime.now().strftime("%Y%m%d%H%M%S")
         self.pipeline_name = training_pipeline.PIPELINE_NAME
         self.artifact_name = training_pipeline.ARTIFACTS_NAME
-        self.artifact_dir = os.path.join(training_pipeline.ARTIFACTS_NAME, timestamps)
+        self.artifact_dir = os.path.join(
+            training_pipeline.ARTIFACTS_NAME, self.timestamps
+        )
+        self.saved_model_dir = os.path.join(
+            training_pipeline.SAVED_MODEL_DIR_NAME, self.timestamps
+        )
+        self.saved_model_file_path = os.path.join(
+            self.saved_model_dir, training_pipeline.MODEL_FILE_NAME
+        )
 
 
 class DataIngestionConfig:
@@ -139,6 +147,9 @@ class ModelTrainerConfig:
             training_pipeline.MODEL_TRAINER_TRAINING_REPORT_DIR_NAME,
             training_pipeline.MODEL_TRAINER_TRAINING_REPORT_FILE_NAME,
         )
+
+        # Saved Model File Path
+        self.saved_model_file_path = config.saved_model_file_path
 
         # Least Acceptable Accuracy
         self.expected_accuracy = training_pipeline.MODEL_TRAINER_EXPECTED_SCORE

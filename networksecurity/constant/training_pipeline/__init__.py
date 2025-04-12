@@ -13,6 +13,7 @@ TEST_DATA_FILE_NAME: str = "test.csv"
 PREPROCESSING_OBJECT_FILE_NAME = "preprocessing.pkl"
 SAVED_MODEL_DIR_NAME = os.path.join("saved_models")
 MODEL_FILE_NAME = "model.pkl"
+TRAINING_BUCKET_NAME: str = "network-security-s3"
 
 
 # Data Ingestion related constants start with "DATA_INGESTION" variable name

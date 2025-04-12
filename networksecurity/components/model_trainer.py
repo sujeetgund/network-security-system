@@ -61,6 +61,7 @@ class ModelTrainer:
         y_train: np.ndarray,
         X_test: np.ndarray,
         y_test: np.ndarray,
+        save_model: bool = True,
     ) -> ModelTrainerArtifact:
         """
         Train the model using various classifiers and select the best one based on performance metrics.
@@ -71,6 +72,8 @@ class ModelTrainer:
             y_train (np.ndarray): Training target variable.
             X_test (np.ndarray): Testing feature set.
             y_test (np.ndarray): Testing target variable.
+            save_model (bool): Flag to indicate whether to save the model to _`saved_model`_ dir or not.
+                Defaults to True.
 
         Raises:
             NetworkSecurityException: If any error occurs during the training process.
@@ -169,6 +172,15 @@ class ModelTrainer:
             save_object(self.config.trained_model_file_path, network_model)
             logger.info(f"Network model saved at {self.config.trained_model_file_path}")
 
+            if save_model:
+                # Save network model to `saved_models` directory
+                logger.info("save_model is True")
+                logger.info("Saving network model to saved model directory")
+                os.makedirs(
+                    os.path.dirname(self.config.saved_model_file_path), exist_ok=True
+                )
+                save_object(self.config.saved_model_file_path, network_model)
+
             # Create Model Trainer Artifact
             model_trainer_artifact = ModelTrainerArtifact(
                 trained_model_file_path=self.config.trained_model_file_path,
@@ -179,7 +191,21 @@ class ModelTrainer:
         except Exception as e:
             raise NetworkSecurityException(e)
 
-    def init_model_trainer(self) -> ModelTrainerArtifact:
+    def init_model_trainer(self, save_model: bool = True) -> ModelTrainerArtifact:
+        """
+        Initialize the model trainer by loading the data transformation artifact, training the model,
+        and saving the model if specified.
+
+        Args:
+            save_model (bool, optional): Flag to indicate whether to save the model to _`saved_model`_ dir or not.
+                Defaults to True.
+
+        Raises:
+            NetworkSecurityException: If any error occurs during the model training process.
+
+        Returns:
+            ModelTrainerArtifact: An object containing the file path of the trained model and performance metrics.
+        """
         logger.info("Model trainer started")
         try:
             train_file_path = (
@@ -205,7 +231,9 @@ class ModelTrainer:
             logger.info(f"y_train shape: {y_train.shape}")
             logger.info(f"X_test shape: {X_test.shape}")
             logger.info(f"y_test shape: {y_test.shape}")
-            model_trainer_artifact = self.train_model(X_train, y_train, X_test, y_test)
+            model_trainer_artifact = self.train_model(
+                X_train, y_train, X_test, y_test, save_model=save_model
+            )
 
             logger.info("Model trainer completed")
 

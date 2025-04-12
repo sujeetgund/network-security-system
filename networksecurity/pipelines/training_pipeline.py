@@ -1,3 +1,5 @@
+import os
+
 from networksecurity.entity.config_entity import (
     TrainingPipelineConfig,
     DataIngestionConfig,
@@ -18,6 +20,9 @@ from networksecurity.components.data_validation import DataValidation
 from networksecurity.components.data_transformation import DataTransformation
 from networksecurity.components.model_trainer import ModelTrainer
 
+from networksecurity.cloud import S3Sync
+from networksecurity.constant.training_pipeline import TRAINING_BUCKET_NAME
+
 from networksecurity.exception import NetworkSecurityException
 from networksecurity.logging import logger
 
@@ -25,6 +30,8 @@ from networksecurity.logging import logger
 class TrainingPipeline:
     def __init__(self, config: TrainingPipelineConfig):
         self.config = config
+        self.s3_sync = S3Sync()
+        self.training_bucket_name = TRAINING_BUCKET_NAME
 
     def start_data_ingestion(self) -> DataIngestionArtifact:
         """
@@ -131,12 +138,64 @@ class TrainingPipeline:
         except Exception as e:
             raise NetworkSecurityException(e)
 
-    def run_pipeline(self) -> ModelTrainerArtifact:
+    def sync_artifact_dir_to_s3(self) -> None:
+        """
+        This function is responsible for syncing the artifact directory to S3.
+
+        Raises:
+            NetworkSecurityException: If there is an error during syncing the artifact directory to S3.
+
+        Returns:
+            None
+        """
+        logger.info("Syncing artifact directory to S3")
+        try:
+            aws_bucket_url = (
+                f"s3://{self.training_bucket_name}/{self.config.artifact_dir}"
+            )
+            self.s3_sync.sync_folder_to_s3(
+                local_folder=self.config.artifact_dir, bucket_url=aws_bucket_url
+            )
+
+            logger.info("Artifact directory synced to S3 successfully")
+        except Exception as e:
+            raise NetworkSecurityException(e)
+
+    def sync_saved_model_dir_to_s3(self) -> None:
+        """
+        This function is responsible for syncing the saved model directory to S3.
+
+        Raises:
+            NetworkSecurityException: If there is an error during syncing the saved model directory to S3.
+
+        Returns:
+            None
+        """
+        logger.info("Syncing saved model directory to S3")
+        try:
+            aws_bucket_url = (
+                f"s3://{self.training_bucket_name}/{self.config.saved_model_dir}"
+            )
+            self.s3_sync.sync_folder_to_s3(
+                local_folder=self.config.saved_model_dir, bucket_url=aws_bucket_url
+            )
+
+            logger.info("Saved model directory synced to S3 successfully")
+        except Exception as e:
+            raise NetworkSecurityException(e)
+
+    def run_pipeline(
+        self, sync_artifact: bool = True, sync_model: bool = True
+    ) -> ModelTrainerArtifact:
         """
         This function is responsible for running the entire training pipeline.
         It orchestrates the execution of various components such as data ingestion,
         data validation, data transformation, and model training.
         It returns the final model trainer artifact.
+
+        Args:
+            sync_artifact (bool, optional): Flag to indicate whether to sync the artifact directory to S3. Default is True.
+            sync_model (bool, optional): Flag to indicate whether to sync the saved model directory to S3. Default is True.
 
         Raises:
             NetworkSecurityException: If there is an error during executing the training pipeline.
@@ -155,6 +214,12 @@ class TrainingPipeline:
             model_trainer_artifact = self.start_model_trainer(
                 data_transformation_artifact=data_transformation_artifact
             )
+
+            # Syncing artifact and saved model directories to S3
+            if sync_artifact:
+                self.sync_artifact_dir_to_s3()
+            if sync_model:
+                self.sync_saved_model_dir_to_s3()
 
             return model_trainer_artifact
         except Exception as e:

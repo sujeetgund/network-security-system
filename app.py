@@ -49,7 +49,7 @@ def train_route():
         training_pipeline_config = TrainingPipelineConfig()
         train_pipeline = TrainingPipeline(config=training_pipeline_config)
         train_pipeline.run_pipeline()
-        return Response("Training is successful")
+        return Response("Training was successful")
     except Exception as e:
         logger.error(f"Error occurred: {e}")
         raise NetworkSecurityException(e)
